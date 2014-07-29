@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.13.2 ([#119](https://git.mobcastdev.com/Zuul/zuul-server/pull/119) 2014-07-29 11:19:12)
+
+Removed sqlite3 dependency
+
+### Improvements
+
+- Removed sqlite3 dependency as it isn't used and means the CI server configuration would need to be changed to support it if we keep it.
+
 ## 0.13.1 ([#105](https://git.mobcastdev.com/Zuul/zuul-server/pull/105) 2014-07-21 08:25:22)
 
 Use percent
