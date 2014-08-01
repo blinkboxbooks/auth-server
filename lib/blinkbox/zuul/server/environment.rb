@@ -9,13 +9,18 @@ module Blinkbox
     module Server
       class App < Sinatra::Base
 
-        PROPERTIES_FILE = "./zuul.properties"
+        REF_PROPFILE = File.join(__dir__,"../../../../config/reference.properties")
+        APP_PROPFILE = File.join(__dir__,"../../../../config/application.properties")
 
         configure do
           I18n.config.enforce_available_locales = true
 
-          raise "No properties file found." unless File.exist?(PROPERTIES_FILE)
-          set :properties, JavaProperties::Properties.new(PROPERTIES_FILE)
+          properties = JavaProperties::Properties.new(REF_PROPFILE)
+          properties.load(APP_PROPFILE) if File.exists? APP_PROPFILE
+
+          set :properties, properties
+
+          raise RuntimeError, "Keys folder does not exist at #{settings.properties[:'auth.keysPath']}" unless File.directory? settings.properties[:'auth.keysPath']
 
           disable :show_exceptions, :dump_errors
 

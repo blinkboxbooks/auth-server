@@ -27,7 +27,9 @@ TEST_CONFIG[:in_proc] = if /^(false|no)$/i === ENV["IN_PROC"]
                         end
 TEST_CONFIG[:local_network] = !(/\.com$/i === TEST_CONFIG[:server].host)
 TEST_CONFIG[:debug] = /^(true|yes)$/i === ENV["DEBUG"]
-TEST_CONFIG[:properties] = JavaProperties::Properties.new("./zuul.properties")
+TEST_CONFIG[:properties] = JavaProperties::Properties.new("./config/reference.properties")
+test_propfile = "./config/testing.properties"
+TEST_CONFIG[:properties].load(test_propfile) if File.exist? test_propfile
 
 p TEST_CONFIG if TEST_CONFIG[:debug]
 
