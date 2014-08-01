@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.13.3 ([#122](https://git.mobcastdev.com/Zuul/zuul-server/pull/122) 2014-08-01 18:11:51)
+
+Added MySQL2 adapter
+
+### Bug fix
+
+- Need the activerecord-mysql2-adapter gem for RPM deployment
+
 ## 0.13.2 ([#119](https://git.mobcastdev.com/Zuul/zuul-server/pull/119) 2014-07-29 11:19:12)
 
 Removed sqlite3 dependency
