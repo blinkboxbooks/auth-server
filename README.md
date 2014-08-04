@@ -52,7 +52,7 @@ $ git submodule init
 $ git submodule update
 ```
 
-Finally, you will need to ensure you have some development keys installed at `/opt/bbb/keys` (or wherever you have specified in your `appliction.properties`). The (compromised) development keys used as of 2014-08-01 can be found [in a previous commit on github](https://git.mobcastdev.com/Zuul/zuul-server/tree/1043169495cdbc9a60240572c0ff6f828816ae53/keys).
+Finally, you will need to ensure you have some development keys installed at `/opt/bbb/keys` (or wherever you have specified in your `application.properties`). The (compromised) development keys used as of 2014-08-01 can be found [in a previous commit on github](https://git.mobcastdev.com/Zuul/zuul-server/tree/1043169495cdbc9a60240572c0ff6f828816ae53/keys).
 
 ## Rig install on CentOS
 
@@ -83,7 +83,7 @@ $ git submodule init
 $ git submodule update
 ```
 
-Finally, you will need to ensure you have some secure keys installed at `/opt/bbb/keys` (or wherever you have specified in your `appliction.properties`).
+Finally, you will need to ensure you have some secure keys installed at `/opt/bbb/keys` (or wherever you have specified in your `application.properties`).
 
 ## MySQL database creation
 
