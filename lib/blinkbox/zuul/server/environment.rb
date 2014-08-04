@@ -12,16 +12,41 @@ module Blinkbox
         REF_PROPFILE = File.join(__dir__,"../../../../config/reference.properties")
         APP_PROPFILE = File.join(__dir__,"../../../../config/application.properties")
 
+        PROPERTIES_REQUIREMENTS = [
+          {
+            keys: %w{auth.keysPath},
+            validity_test: proc { |p| File.directory? p[:'auth.keysPath'] },
+            error: "Keys folder does not exist"
+          },
+          {
+            keys: %w{database_url},
+            validity_test: proc { |p| !p[:database_url].empty? },
+            error: "Database URL is empty"
+          }
+        ]
+
         configure do
           I18n.config.enforce_available_locales = true
 
           properties = JavaProperties::Properties.new(REF_PROPFILE)
           properties.load(APP_PROPFILE) if File.exists? APP_PROPFILE
 
+          invalid_reqs = PROPERTIES_REQUIREMENTS.map { |req|
+            unless req[:validity_test].call(properties)
+              req[:error] + " (#{req[:keys].join(', ')})"
+            end
+          }.compact
+
+          if invalid_reqs.any?
+            $stderr.puts "The application cannot start because of invalid properties:\n  #{invalid_reqs.join("\n  ")}"
+            $stderr.puts "\nProperties used:\n"
+            properties.each do |key, value|
+              $stderr.puts "  #{key} = #{value}"
+            end
+            Process.exit(1)
+          end
+
           set :properties, properties
-
-          raise RuntimeError, "Keys folder does not exist at #{settings.properties[:'auth.keysPath']}" unless File.directory? settings.properties[:'auth.keysPath']
-
           disable :show_exceptions, :dump_errors
 
           db = URI.parse(settings.properties[:database_url])
