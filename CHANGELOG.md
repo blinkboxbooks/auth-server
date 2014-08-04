@@ -1,5 +1,15 @@
 # Zuul Server Change Log
 
+## 0.13.7 ([#121](https://git.mobcastdev.com/Zuul/zuul-server/pull/121) 2014-08-01 10:52:54)
+
+Application & Reference Config; specify keys directory
+
+### Improvements
+
+- Moved configuration to `config/reference.properties` (for sane defaults) and `config/application.properties` (for environment specific settings)
+- Included a `config/testing.properties` for the test environment (The application being tested will still load `config/application.properties`!)
+- Added new config `auth.keysPath` which is the location where keys should be searched for.
+
 ## 0.13.6 ([#125](https://git.mobcastdev.com/Zuul/zuul-server/pull/125) 2014-08-04 10:29:12)
 
 New Relic Log file location
