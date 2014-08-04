@@ -28,7 +28,7 @@ module Blinkbox::Zuul::Server
       end
     end
     use Rack::JsonLogger, LOGGER_NAME, logdev: settings.properties["logging.error.file"], level: ::Logger.const_get(settings.properties["logging.error.level"])
-    use Rack::Blinkbox::Zuul::TokenDecoder
+    use Rack::Blinkbox::Zuul::TokenDecoder, Rack::Blinkbox::Zuul::FileKeyFinder.new(settings.properties['auth.keysPath'])
     helpers Sinatra::OAuthHelper
     helpers Sinatra::WWWAuthenticateHelper
     register Sinatra::Namespace
@@ -425,12 +425,13 @@ module Blinkbox::Zuul::Server
       claims["bb/rol"] = refresh_token.user.role_names if refresh_token.user.roles.any?
       claims["zl/rti"] = refresh_token.id # for checking whether the issuing token has been revoked
 
+      keys_dir = settings.properties[:'auth.keysPath']
       sig_key_id = settings.properties[:signing_key_id]
-      signer = Sandal::Sig::ES256.new(File.read("./keys/#{sig_key_id}/private.pem"))
+      signer = Sandal::Sig::ES256.new(File.read(File.join(keys_dir, sig_key_id, "private.pem")))
       jws_token = Sandal.encode_token(claims, signer, { "kid" => sig_key_id })
 
       enc_key_id = settings.properties[:encryption_key_id]
-      encrypter = Sandal::Enc::A128GCM.new(Sandal::Enc::Alg::RSA_OAEP.new(File.read("./keys/#{enc_key_id}/public.pem")))
+      encrypter = Sandal::Enc::A128GCM.new(Sandal::Enc::Alg::RSA_OAEP.new(File.read(File.join(keys_dir, enc_key_id, "public.pem"))))
       Sandal.encrypt_token(jws_token, encrypter, { "kid" => enc_key_id, "cty" => "JWT" })
     end
 

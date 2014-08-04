@@ -9,14 +9,45 @@ module Blinkbox
     module Server
       class App < Sinatra::Base
 
-        PROPERTIES_FILE = "./zuul.properties"
+        REF_PROPFILE = File.join(__dir__,"../../../../config/reference.properties")
+        APP_PROPFILE = File.join(__dir__,"../../../../config/application.properties")
+
+        PROPERTIES_REQUIREMENTS = [
+          {
+            keys: %i{auth.keysPath},
+            validity_test: proc { |p| File.directory? p[:'auth.keysPath'] },
+            error: "Keys folder does not exist"
+          },
+          {
+            keys: %i{database_url},
+            validity_test: proc { |p| !p[:database_url].empty? },
+            error: "Database URL is empty"
+          }
+        ]
 
         configure do
           I18n.config.enforce_available_locales = true
 
-          raise "No properties file found." unless File.exist?(PROPERTIES_FILE)
-          set :properties, JavaProperties::Properties.new(PROPERTIES_FILE)
+          properties = JavaProperties::Properties.new(REF_PROPFILE)
+          properties.load(APP_PROPFILE) if File.exists? APP_PROPFILE
 
+          invalid_props = []
+          invalid_reqs = PROPERTIES_REQUIREMENTS.map { |req|
+            unless req[:validity_test].call(properties)
+              invalid_props = invalid_props + req[:keys]
+              req[:error] + " (#{req[:keys].join(', ')})"
+            end
+          }.compact
+
+          if invalid_reqs.any?
+            $stderr.puts "The application cannot start because of invalid properties:\n  #{invalid_reqs.join("\n  ")}\n\nProperties used:\n"
+            invalid_props.uniq.each do |key|
+              $stderr.puts "  #{key} = #{properties[key]}"
+            end
+            Process.exit(1)
+          end
+
+          set :properties, properties
           disable :show_exceptions, :dump_errors
 
           db = URI.parse(settings.properties[:database_url])

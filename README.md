@@ -52,6 +52,8 @@ $ git submodule init
 $ git submodule update
 ```
 
+Finally, you will need to ensure you have some development keys installed at `/opt/bbb/keys` (or wherever you have specified in your `application.properties`). The (compromised) development keys used as of 2014-08-01 can be found [in a previous commit on github](https://git.mobcastdev.com/Zuul/zuul-server/tree/1043169495cdbc9a60240572c0ff6f828816ae53/keys).
+
 ## Rig install on CentOS
 
 On the CentOS image, the Ruby environment with OpenSSL should be already set up correctly. You can check this in the same way as the developer install.
@@ -81,9 +83,11 @@ $ git submodule init
 $ git submodule update
 ```
 
+Finally, you will need to ensure you have some secure keys installed at `/opt/bbb/keys` (or wherever you have specified in your `application.properties`).
+
 ## MySQL database creation
 
-The database connection settings can be configured in the app.properties file by changing the `database_url` property. Note that this file is not committed to git, but you can clone one of the example files and edit it for your installation. An example connection setting is:
+The database connection settings can be configured in the `config/application.properties` file by changing the `database_url` property. Note that this file is not committed to git, but you can clone one of the example files and edit it for your installation. An example connection setting is:
 
 ```
 database_url = mysql://username:password@host:port/database
@@ -124,11 +128,7 @@ $ rake db:migrate_with_ddl["my_file.sql"]
 
 The production server runs in Apache/Passenger and is not documented here in any detail. However, it still needs to follow the same process to configure the application.
 
-To configure the app, select one of the example zuul.properties files and copy it to the real configuration file name, e.g.
-
-```
-$ cp zuul.properties.development zuul.properties
-```
+To configure the app, create a `config/application.properties` file with the settings you require. The `config/reference.properties` file has descriptions and details of all the feasible settings.
 
 Once that is done, edit the file to ensure you have the correct settings. Most of them should be fine as they are, but you'll probably need to put the correct credentials in the `database_url` property, as described in setting up the database.
 
@@ -177,6 +177,8 @@ $ cucumber -t ~@slow -t ~@extremely_slow DEBUG=true
 Note that the `AUTH_SERVER`, `PROXY_SERVER` and `DEBUG` variables can be used together.
 
 All of the tests should pass. If they don't, fix it or raise a bug.
+
+It's worth noting that `config/testing.properties` is loaded by the test code, but the application being tested will still load `config/application.properties`.
 
 ## Updating GeoIP data files
 
