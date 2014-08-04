@@ -28,7 +28,7 @@ module Blinkbox::Zuul::Server
       end
     end
     use Rack::JsonLogger, LOGGER_NAME, logdev: settings.properties["logging.error.file"], level: ::Logger.const_get(settings.properties["logging.error.level"])
-    use Rack::Blinkbox::Zuul::TokenDecoder
+    use Rack::Blinkbox::Zuul::TokenDecoder, Rack::Blinkbox::Zuul::FileKeyFinder.new(settings.properties['auth.keysPath'])
     helpers Sinatra::OAuthHelper
     helpers Sinatra::WWWAuthenticateHelper
     register Sinatra::Namespace

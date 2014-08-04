@@ -14,12 +14,12 @@ module Blinkbox
 
         PROPERTIES_REQUIREMENTS = [
           {
-            keys: %w{auth.keysPath},
+            keys: %i{auth.keysPath},
             validity_test: proc { |p| File.directory? p[:'auth.keysPath'] },
             error: "Keys folder does not exist"
           },
           {
-            keys: %w{database_url},
+            keys: %i{database_url},
             validity_test: proc { |p| !p[:database_url].empty? },
             error: "Database URL is empty"
           }
@@ -31,20 +31,20 @@ module Blinkbox
           properties = JavaProperties::Properties.new(REF_PROPFILE)
           properties.load(APP_PROPFILE) if File.exists? APP_PROPFILE
 
+          invalid_props = []
           invalid_reqs = PROPERTIES_REQUIREMENTS.map { |req|
             unless req[:validity_test].call(properties)
+              invalid_props = invalid_props + req[:keys]
               req[:error] + " (#{req[:keys].join(', ')})"
             end
           }.compact
 
           if invalid_reqs.any?
-            $stderr.puts "The application cannot start because of invalid properties:\n  #{invalid_reqs.join("\n  ")}\n"
+            $stderr.puts "The application cannot start because of invalid properties:\n  #{invalid_reqs.join("\n  ")}\n\nProperties used:\n"
+            invalid_props.uniq.each do |key|
+              $stderr.puts "  #{key} = #{properties[key]}"
+            end
             Process.exit(1)
-          end
-
-          $stderr.puts "Properties used:\n"
-          properties.each do |key, value|
-            $stderr.puts "  #{key} = #{value}"
           end
 
           set :properties, properties
