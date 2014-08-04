@@ -38,12 +38,13 @@ module Blinkbox
           }.compact
 
           if invalid_reqs.any?
-            $stderr.puts "The application cannot start because of invalid properties:\n  #{invalid_reqs.join("\n  ")}"
-            $stderr.puts "\nProperties used:\n"
-            properties.each do |key, value|
-              $stderr.puts "  #{key} = #{value}"
-            end
+            $stderr.puts "The application cannot start because of invalid properties:\n  #{invalid_reqs.join("\n  ")}\n"
             Process.exit(1)
+          end
+
+          $stderr.puts "Properties used:\n"
+          properties.each do |key, value|
+            $stderr.puts "  #{key} = #{value}"
           end
 
           set :properties, properties
