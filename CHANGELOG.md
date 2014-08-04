@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.13.5 ([#124](https://git.mobcastdev.com/Zuul/zuul-server/pull/124) 2014-08-04 08:52:25)
+
+No need for MySQL2 adapter
+
+### Improvements
+
+- Don't need the MySQL2 adapter gem listed explicitly any more.
+
 ## 0.13.4 ([#123](https://git.mobcastdev.com/Zuul/zuul-server/pull/123) 2014-08-04 08:39:48)
 
 HA! You little bastard. You depend on MySQL shared libraries
