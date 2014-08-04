@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.13.6 ([#125](https://git.mobcastdev.com/Zuul/zuul-server/pull/125) 2014-08-04 10:29:12)
+
+New Relic Log file location
+
+### Improvement
+
+- Moved the location of the new relic logfile to an ops-approved location.
+
 ## 0.13.5 ([#124](https://git.mobcastdev.com/Zuul/zuul-server/pull/124) 2014-08-04 08:52:25)
 
 No need for MySQL2 adapter
