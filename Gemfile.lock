@@ -9,8 +9,6 @@ GEM
       activemodel (= 4.1.4)
       activesupport (= 4.1.4)
       arel (~> 5.0.0)
-    activerecord-mysql2-adapter (0.0.3)
-      mysql2
     activesupport (4.1.4)
       i18n (~> 0.6, >= 0.6.9)
       json (~> 1.7, >= 1.7.7)
@@ -151,7 +149,6 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (~> 4.0)
-  activerecord-mysql2-adapter
   bundler
   bunny (~> 0.0, >= 0.10.8)
   coveralls
