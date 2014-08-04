@@ -1,2 +1,4 @@
 %define app_name        auth-server
 %define app_ver         %(cat VERSION)
+
+Requires: Percona-Server-shared-56
