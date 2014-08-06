@@ -160,7 +160,7 @@ Feature: Registration
       | GB      |
       | IE      |
 
-  @in_proc
+  @in_proc_only
   Scenario Outline: Registering while on the local machine or a private network
     For development and testing purposes internally, we need to ensure that we do not prevent
     registration from the local machine or private network addresses which cannot be geolocated
@@ -188,7 +188,7 @@ Feature: Registration
       | FR      |
       | US      |
 
-  @in_proc
+  @in_proc_only
   Scenario: Trying to register when geolocation cannot be determined
     Given my IP address cannot be geolocated
     When I try to register an account

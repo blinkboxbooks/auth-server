@@ -1,9 +1,11 @@
 $: << "./lib" if Dir.pwd == File.dirname(__FILE__)
 require "sinatra/activerecord/rake"
-require "blinkbox/zuul/server/environment"
 
 task :default => :build
 task :build => :test
+task :in_proc_environment do
+  require "blinkbox/zuul/server/environment"
+end
 
 desc "Runs all tests"
 task :test do
@@ -37,6 +39,8 @@ rescue LoadError
 end
 
 namespace :db do
+  task :migrate => :in_proc_environment
+
   desc "Migrates the database and outputs the generated DDL to a file"
   task :migrate_with_ddl, :file do |task, args|
     File.open(args[:file] || "migration.sql", "w") do |file|
