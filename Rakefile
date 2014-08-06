@@ -1,6 +1,5 @@
 $: << "./lib" if Dir.pwd == File.dirname(__FILE__)
 require "sinatra/activerecord/rake"
-require "blinkbox/zuul/server/environment"
 
 task :default => :build
 task :build => :test
@@ -39,6 +38,8 @@ end
 namespace :db do
   desc "Migrates the database and outputs the generated DDL to a file"
   task :migrate_with_ddl, :file do |task, args|
+    require "blinkbox/zuul/server/environment"
+
     File.open(args[:file] || "migration.sql", "w") do |file|
       ActiveSupport::Notifications.subscribe("sql.active_record") do |*ignored, payload|
         sql = payload[:sql].strip.gsub(/\s+/, " ")
