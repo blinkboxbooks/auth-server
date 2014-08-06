@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.13.8 ([#126](https://git.mobcastdev.com/Zuul/zuul-server/pull/126) 2014-08-06 11:16:35)
+
+Update cucumber config
+
+Test improvement - new cucumber profiles
+This change is so we can run the tests out of process against the DevInt environment
+
+
 ## 0.13.7 ([#121](https://git.mobcastdev.com/Zuul/zuul-server/pull/121) 2014-08-01 10:52:54)
 
 Application & Reference Config; specify keys directory
