@@ -4,6 +4,7 @@ require "sandal"
 require "scrypt"
 
 require "rack/blinkbox/zuul/tokens"
+require "rack/forward"
 require "rack/jsonlogger"
 require "rack/timekeeper"
 require "sinatra/contrib"
@@ -27,8 +28,51 @@ module Blinkbox::Zuul::Server
       else :ERROR
       end
     end
+
     use Rack::JsonLogger, LOGGER_NAME, logdev: settings.properties["logging.error.file"], level: ::Logger.const_get(settings.properties["logging.error.level"])
     use Rack::Blinkbox::Zuul::TokenDecoder, Rack::Blinkbox::Zuul::FileKeyFinder.new(settings.properties['auth.keysPath'])
+
+    use Rack::Forward do |req|
+      # authenticated requests are trivial
+      user_id = req.env["zuul.user_id"]
+      user = User.find_by_id(user_id) if user_id
+      is_employee = user && user.username =~ /.*@blinkbox.com/i
+
+      # other requests need a bit more work
+      case req.path_info.downcase
+      when "/oauth2/token"
+        case req.params["grant_type"]
+        when "password"
+          is_employee = req.params["username"] && req.params["username"] =~ /.*@blinkbox.com/i
+        when "refresh_token"
+          refresh_token = req.params["refresh_token"] && RefreshToken.find_by_token(req.params["refresh_token"])
+          is_employee == refresh_token && refresh_token.user.username =~ /.*@blinkbox.com/i
+        when "urn:blinkbox:oauth:grant-type:password-reset-token"
+          # TODO: This may be if we can't find the password reset token because we didn't store it
+          reset_token = req.params["password_reset_token"] && PasswordResetToken.find_by_token(req.params["password_reset_token"])
+          is_employee = reset_token && reset_token.user.username =~ /.*@blinkbox.com/i
+        when "urn:blinkbox:oauth:grant-type:registration"
+          is_employee = req.params["username"] && req.params["username"] =~ /.*@blinkbox.com/i
+        end
+      when "/password/reset"
+        is_employee = req.params["username"] && req.params["username"] =~ /.*@blinkbox.com/i
+      when "/password/reset/validate-token"
+        # TODO: This may be if we can't find the password reset token because we didn't store it
+        reset_token = req.params["password_reset_token"] && PasswordResetToken.find_by_token(req.params["password_reset_token"])
+        is_employee = reset_token && reset_token.user.username =~ /.*@blinkbox.com/i
+      when "/tokens/revoke"
+        refresh_token = req.params["refresh_token"] && RefreshToken.find_by_token(req.params["refresh_token"])
+        is_employee == refresh_token && refresh_token.user.username =~ /.*@blinkbox.com/i
+      end
+
+      # redirect employees to the delegate auth server
+      if is_employee
+        puts "redirecting to delegate auth server"
+        query = "?" + req.query_string if req.query_string
+        URI.parse("http://localhost:9494#{req.path_info}#{query}")
+      end
+    end
+
     helpers Sinatra::OAuthHelper
     helpers Sinatra::WWWAuthenticateHelper
     register Sinatra::Namespace
