@@ -103,28 +103,31 @@ When(/^(\w+) obtains an access token using (?:his|her|their) password reset toke
 end
 
 Then(/^I receive a (.+) email$/) do |email_type|
-  @email_message = Nokogiri::XML(Blinkbox::Zuul::Server::Email.sent_messages.pop)
+  # This step relies on the server running in-process, and having the SendsMessagetoFakeQueues module loaded in
+  if TEST_CONFIG[:in_proc]
+    @email_message = Nokogiri::XML(Blinkbox::Zuul::Server::Email.sent_messages.pop)
 
-  email_message_value("/e:sendEmail/e:to/e:recipient/e:name") do |text| 
-    expect(text).to eq("#{@me.first_name} #{@me.last_name}")
-  end 
-  email_message_value("/e:sendEmail/e:to/e:recipient/e:email") do |text| 
-    expect(text).to eq(@me.username)
-  end 
-  email_message_value("/e:sendEmail/e:template") do |text| 
-    expect(text).to eq(email_type.tr(" ", "_"))
+    email_message_value("/e:sendEmail/e:to/e:recipient/e:name") do |text|
+      expect(text).to eq("#{@me.first_name} #{@me.last_name}")
+    end
+    email_message_value("/e:sendEmail/e:to/e:recipient/e:email") do |text|
+      expect(text).to eq(@me.username)
+    end
+    email_message_value("/e:sendEmail/e:template") do |text|
+      expect(text).to eq(email_type.tr(" ", "_"))
+    end
   end
 end
 
 Then(/^(?:the email|it) contains a secure password reset link$/) do
-  email_message_value("/e:sendEmail/e:templateVariables/e:templateVariable[e:key='resetLink']/e:value") do |text| 
+  email_message_value("/e:sendEmail/e:templateVariables/e:templateVariable[e:key='resetLink']/e:value") do |text|
     expect(text).to match(/https:\/\//) # the reset link should be a secure page
     expect(text).to match(URI::regexp)  # and should be a value uri
   end
 end
 
 Then(/^(?:the email|it) contains a password reset token with at least (#{CAPTURE_INTEGER}) characters$/) do |min_length|
-  email_message_value("/e:sendEmail/e:templateVariables/e:templateVariable[e:key='resetToken']/e:value") do |text| 
+  email_message_value("/e:sendEmail/e:templateVariables/e:templateVariable[e:key='resetToken']/e:value") do |text|
     expect(text.length).to be >=(min_length)
   end
 end
@@ -137,7 +140,7 @@ def email_message_value(xpath)
   elem = @email_message.at_xpath(xpath, e: "http://schemas.blinkbox.com/books/emails/sending/v1")
   expect(elem).to_not be_nil
   if block_given?
-    yield elem.text 
+    yield elem.text
   else
     elem.text
   end
