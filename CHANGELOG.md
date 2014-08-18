@@ -1,5 +1,16 @@
 # Zuul Server Change Log
 
+## 0.13.9 ([#127](https://git.mobcastdev.com/Zuul/zuul-server/pull/127) 2014-08-18 12:22:30)
+
+Patch for running against DevInt on CI
+
+Patch for running against DevInt on CI:
+
+* Simplify and merge cucumber.yml config files
+* Empty results/ folder so CI jobs don't complain when ran
+* Don't run steps that rely on in-process monkey-patching when targeting external instances
+* Some minor whitespace cleanup
+
 ## 0.13.8 ([#126](https://git.mobcastdev.com/Zuul/zuul-server/pull/126) 2014-08-06 11:16:35)
 
 Update cucumber config
