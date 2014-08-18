@@ -1,3 +1,4 @@
+require "active_record"
 require_relative "../validators/user_client_validator"
 
 module Blinkbox::Zuul::Server

@@ -1,3 +1,5 @@
+require "active_record"
+
 module Blinkbox::Zuul::Server
   class PasswordResetToken < ActiveRecord::Base
 

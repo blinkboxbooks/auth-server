@@ -31,7 +31,7 @@ module Blinkbox::Zuul::Server
 
     use Rack::JsonLogger, LOGGER_NAME, logdev: settings.properties["logging.error.file"], level: ::Logger.const_get(settings.properties["logging.error.level"])
     use Rack::Blinkbox::Zuul::TokenDecoder, Rack::Blinkbox::Zuul::FileKeyFinder.new(settings.properties['auth.keysPath'])
-    use Rack::Blinkbox::Zuul::SSOForward
+    use Rack::Blinkbox::Zuul::SSOForward, delegate_server: settings.properties["delegate_auth_server_url"]
     helpers Sinatra::OAuthHelper
     helpers Sinatra::WWWAuthenticateHelper
     register Sinatra::Namespace
