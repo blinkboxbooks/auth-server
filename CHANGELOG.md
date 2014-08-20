@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.14.0 ([#128](https://git.mobcastdev.com/Zuul/zuul-server/pull/128) 2014-08-18 15:25:51)
+
+Added the ability to proxy SSO requests
+
+### New features
+
+- Can now proxy requests from employees to a delegate auth server
+
 ## 0.13.9 ([#127](https://git.mobcastdev.com/Zuul/zuul-server/pull/127) 2014-08-18 12:22:30)
 
 Patch for running against DevInt on CI
