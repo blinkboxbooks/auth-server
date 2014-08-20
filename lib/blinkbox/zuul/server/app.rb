@@ -4,6 +4,7 @@ require "sandal"
 require "scrypt"
 
 require "rack/blinkbox/zuul/tokens"
+require "rack/blinkbox/zuul/sso_forward"
 require "rack/jsonlogger"
 require "rack/timekeeper"
 require "sinatra/contrib"
@@ -27,8 +28,10 @@ module Blinkbox::Zuul::Server
       else :ERROR
       end
     end
+
     use Rack::JsonLogger, LOGGER_NAME, logdev: settings.properties["logging.error.file"], level: ::Logger.const_get(settings.properties["logging.error.level"])
     use Rack::Blinkbox::Zuul::TokenDecoder, Rack::Blinkbox::Zuul::FileKeyFinder.new(settings.properties['auth.keysPath'])
+    use Rack::Blinkbox::Zuul::SSOForward, delegate_server: settings.properties["delegate_auth_server_url"]
     helpers Sinatra::OAuthHelper
     helpers Sinatra::WWWAuthenticateHelper
     register Sinatra::Namespace

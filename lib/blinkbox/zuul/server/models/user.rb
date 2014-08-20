@@ -1,3 +1,4 @@
+require "active_record"
 require "blinkbox/zuul/server/errors"
 
 module Blinkbox::Zuul::Server
