@@ -7,6 +7,18 @@ Feature: Password authentication
   Background:
     Given I have registered an account
 
+  Scenario Outline: Trying to authenticate with valid credentials but a missing client authentication detail
+    Given I have registered a client
+    When I provide my email address, password and client credentials
+    But I do not provide my client <detail>
+    And I submit the authentication request
+    Then the response indicates that the client credentials are incorrect
+
+  Examples:
+    | detail |
+    | id     |
+    | secret |
+
   @smoke
   Scenario: Authenticating with valid credentials
     When I provide my email address and password
@@ -50,18 +62,6 @@ Feature: Password authentication
     And it contains basic user information matching my details
     And it contains client information, excluding the client secret
     And it is not cacheable
-
-  Scenario Outline: Trying to authenticate with valid credentials but a missing client authentication detail
-    Given I have registered a client
-    When I provide my email address, password and client credentials
-    But I do not provide my client <detail>
-    And I submit the authentication request
-    Then the response indicates that the client credentials are incorrect
-
-    Examples:
-      | detail |
-      | id     |
-      | secret |
 
   Scenario: Trying to authenticate with valid credentials but an incorrect client secret
     Given I have registered a client
