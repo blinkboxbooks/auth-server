@@ -9,19 +9,19 @@ module Rack
     module Zuul
       class SSOForward < Rack::Forward
 
-        def initialize(app, delegate_server: nil)
+        def initialize(app, delegate_server: nil, forwarded_domains: nil)
           super(app) do |req|
             unless delegate_server.nil? || delegate_server.empty?
               # for authenticated requests we can check the user identifier
-              is_employee = is_employee_user_id?(req.env["zuul.user_id"])
+              is_forwarded = is_forwarded_user_id?(req.env["zuul.user_id"])
 
               # for unauthenticated requests we can tell from one of the parameters
-              is_employee ||= is_employee_username?(req.params["username"]) ||
-                              is_employee_refresh_token?(req.params["refresh_token"]) ||
-                              is_employee_reset_token?(req.params["password_reset_token"])
+              is_forwarded ||= is_forwarded_username?(req.params["username"]) ||
+                              is_forwarded_refresh_token?(req.params["refresh_token"]) ||
+                              is_forwarded_reset_token?(req.params["password_reset_token"])
 
-              # redirect employees to the delegate auth server
-              if is_employee
+              # redirect forwardeds to the delegate auth server
+              if is_forwarded
                 query_string = "?" + req.query_string unless req.query_string.empty?
                 URI.parse("#{delegate_server}#{req.path_info}#{query_string}")
               end
@@ -29,27 +29,29 @@ module Rack
           end
         end
 
-        def is_employee_reset_token?(token)
+        def is_forwarded_reset_token?(token)
           reset_token = ::Blinkbox::Zuul::Server::PasswordResetToken.find_by_token(token) unless token.nil?
-          !reset_token.nil? && is_employee?(reset_token.user)
+          !reset_token.nil? && is_forwarded?(reset_token.user)
         end
 
-        def is_employee_refresh_token?(token)
+        def is_forwarded_refresh_token?(token)
           refresh_token = ::Blinkbox::Zuul::Server::RefreshToken.find_by_token(token) unless token.nil?
-          !refresh_token.nil? && is_employee?(refresh_token.user)
+          !refresh_token.nil? && is_forwarded?(refresh_token.user)
         end
 
-        def is_employee_username?(username)
-          !username.nil? && username.downcase.end_with?("@blinkbox.com")
+        def is_forwarded_username?(username)
+          username_parts = if username.nil? then Array.new() else username.split("@") end
+          forwarded_domains == "*" || (
+            !forwarded_domains.nil? && !username_parts.any? && forwarded_domains.split(",").map { |d| d.strip }.include?(username_parts.last))
         end
 
-        def is_employee_user_id?(user_id)
+        def is_forwarded_user_id?(user_id)
           user = ::Blinkbox::Zuul::Server::User.find_by_id(user_id) unless user_id.nil?
-          is_employee?(user)
+          is_forwarded?(user)
         end
 
-        def is_employee?(user)
-          !user.nil? && is_employee_username?(user.username)
+        def is_forwarded?(user)
+          !user.nil? && is_forwarded_username?(user.username)
         end
 
       end
