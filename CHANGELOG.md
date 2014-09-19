@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.15.0 ([#130](https://git.mobcastdev.com/Zuul/zuul-server/pull/130) 2014-09-19 14:55:19)
+
+Introduce better settings for sso forwarding
+
+### New feature
+
+* Allow the configuration of which username domains have to be forwarded to another service for authentication.
+
 ## 0.14.0 ([#128](https://git.mobcastdev.com/Zuul/zuul-server/pull/128) 2014-08-18 15:25:51)
 
 Added the ability to proxy SSO requests
