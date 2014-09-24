@@ -10,6 +10,8 @@ module Rack
       class SSOForward < Rack::Forward
 
         def initialize(app, delegate_server: nil, forwarded_domains: nil)
+          @forwarded_domains = if forwarded_domains.nil? then Array.new else forwarded_domains.split(",").map { |d| d.strip } end
+
           super(app) do |req|
             unless delegate_server.nil? || delegate_server.empty?
               # for authenticated requests we can check the user identifier
@@ -41,8 +43,8 @@ module Rack
 
         def is_forwarded_username?(username)
           username_parts = if username.nil? then Array.new() else username.split("@") end
-          forwarded_domains == "*" || (
-            !forwarded_domains.nil? && !username_parts.any? && forwarded_domains.split(",").map { |d| d.strip }.include?(username_parts.last))
+          @forwarded_domains == "*" || (
+            !@forwarded_domains.nil? && username_parts.any? && @forwarded_domains.include?(username_parts.last))
         end
 
         def is_forwarded_user_id?(user_id)
