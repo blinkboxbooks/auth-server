@@ -10,7 +10,7 @@ module Rack
       class SSOForward < Rack::Forward
 
         def initialize(app, delegate_server: nil, forwarded_domains: nil)
-          @forwarded_domains = if forwarded_domains.nil? then Array.new else forwarded_domains.split(",").map { |d| d.strip } end
+          @forwarded_domains = if forwarded_domains.strip == "*" then "*" else forwarded_domains.split(",").map { |d| d.strip } rescue [] end
 
           super(app) do |req|
             unless delegate_server.nil? || delegate_server.empty?
