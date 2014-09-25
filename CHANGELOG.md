@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.15.1 ([#131](https://git.mobcastdev.com/Zuul/zuul-server/pull/131) 2014-09-24 15:03:36)
+
+Fix forwarding logic for SSO delegation
+
+### Bugfix
+
+This patch will fix issues caused my lack of ruby-magic and will allow zuul to correctly delegate some requests to another server (i.e. auth-service) based on the provided configuration.
+
 ## 0.15.0 ([#130](https://git.mobcastdev.com/Zuul/zuul-server/pull/130) 2014-09-19 14:55:19)
 
 Introduce better settings for sso forwarding
