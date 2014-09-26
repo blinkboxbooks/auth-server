@@ -5,7 +5,7 @@ class ZuulClient
 
   def initialize(server_uri, proxy_uri = nil)
     self.class.base_uri(server_uri.to_s)
-    proxy_uri ? self.class.http_proxy(proxy_uri.host, proxy_uri.port, proxy_uri.user, proxy_uri.password) : self.class.http_proxy
+    proxy_uri ? self.class.http_proxy(proxy_uri.host, proxy_uri.port, proxy_uri.user, proxy_uri.password) : self.class.http_proxy(nil, nil, nil, nil)
     self.class.debug_output($stderr) if TEST_CONFIG[:debug]
     @headers = {}
   end
