@@ -7,6 +7,19 @@ Feature: Refreshing an access token
   Background:
     Given I have registered an account
 
+  Scenario Outline: Trying to refresh an access token using a refresh token that is bound to a client, with a missing client authentication detail
+    Given I have registered a client
+    And I have bound my tokens to my client
+    When I provide my refresh token and client credentials
+    But I do not provide my client <detail>
+    And I submit the access token refresh request
+    Then the response indicates that the client credentials are incorrect
+
+  Examples:
+    | detail |
+    | id     |
+    | secret |
+
   @smoke
   Scenario: Refreshing an access token using a refresh token
     When I provide my refresh token
@@ -51,19 +64,6 @@ Feature: Refreshing an access token
     And it contains basic user information matching my details
     And it contains client information, excluding the client secret
     And it is not cacheable
-
-  Scenario Outline: Trying to refresh an access token using a refresh token that is bound to a client, with a missing client authentication detail
-    Given I have registered a client
-    And I have bound my tokens to my client
-    When I provide my refresh token and client credentials
-    But I do not provide my client <detail>
-    And I submit the access token refresh request
-    Then the response indicates that the client credentials are incorrect
-
-    Examples:
-      | detail |
-      | id     |
-      | secret |
 
   Scenario: Trying to refresh an access token using a refresh token that is bound to a client, without client credentials
     Given I have registered a client

@@ -9,6 +9,17 @@ Feature: Search for users
     And there is a registered user, call her "Alice"
     And there is a registered user, call him "Bob", who has previously changed his email address
 
+  @negative
+  Scenario Outline: Searching for users with unregistered attributes returns no results
+    When I search for users with an unregistered <attributes>
+    Then the response is a list containing no users
+
+  Examples:
+    | attributes          |
+    | email address       |
+    | first and last name |
+    | user id             |
+
   Scenario: Users can be found by email address
     When I search for users with Alice's email address
     Then the response is a list containing one user
@@ -38,17 +49,6 @@ Feature: Search for users
     When I search for users with Bob's user id
     Then the response is a list containing one user
     And the first user matches Bob's attributes
-
-  @negative
-  Scenario Outline: Searching for users with unregistered attributes returns no results
-    When I search for users with an unregistered <attributes>
-    Then the response is a list containing no users
-
-    Examples:
-      | attributes          |
-      | email address       |
-      | first and last name |
-      | user id             |
 
   @negative
   Scenario: Searching for only a first name is invalid

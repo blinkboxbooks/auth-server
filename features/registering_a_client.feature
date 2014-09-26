@@ -7,6 +7,19 @@ Feature: Registering a client
   Background:
     Given I have registered an account
 
+  Scenario Outline: Registering a client with missing required details
+    When I provide a client model
+    But I do not provide a client <detail>
+    And I submit the client registration request
+    Then the request fails because it is invalid
+
+  Examples:
+    | detail |
+    | name   |
+    | brand  |
+    | model  |
+    | OS     |
+
   @smoke
   Scenario: Registering a client with all details, within critical elevation period
     Given I have a critically elevated access token
@@ -48,19 +61,6 @@ Feature: Registering a client
     Then the response contains client information, including a client secret
     And the client details match the provided details
     And it is not cacheable
-
-  Scenario Outline: Registering a client with missing required details
-    When I provide a client model
-    But I do not provide a client <detail>
-    And I submit the client registration request
-    Then the request fails because it is invalid
-
-    Examples:
-      | detail |
-      | name   |
-      | brand  |
-      | model  |
-      | OS     |
 
   Scenario: Trying to register a client without user authorisation
     When I submit a client registration request, without my access token

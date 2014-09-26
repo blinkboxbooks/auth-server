@@ -133,7 +133,8 @@ Then(/^(?:the email|it) contains a password reset token with at least (#{CAPTURE
 end
 
 Then(/^no email is sent$/) do
-  expect(Blinkbox::Zuul::Server::Email.sent_messages.count).to eq(0)
+  # This step relies on the server running in-process, and having the SendsMessagetoFakeQueues module loaded in
+  expect(Blinkbox::Zuul::Server::Email.sent_messages.count).to eq(0) if TEST_CONFIG[:in_proc]
 end
 
 def email_message_value(xpath)
