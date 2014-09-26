@@ -1,5 +1,14 @@
 # Zuul Server Change Log
 
+## 0.15.2 ([#129](https://git.mobcastdev.com/Zuul/zuul-server/pull/129) 2014-09-05 09:23:05)
+
+Fix tests
+
+#### Test improvement to fix some of the test failures when running out of process against DevInt
+* Clearing the HTTParty proxy. This issue was highlighted when a preceding test used (the currently blocked) wonderproxy.com, the following tests would use the same proxy unintentionally since the proxy was not being cleared on initialisation.  
+* Ignoring some tests/steps when running out of process because they rely on the server running in-process, and having the SendsMessagetoFakeQueues module loaded in.
+* Fixing some failing tests due to a bug in cucumber where the Background doesn't get run for a Scenario Outline when the Scenario Outline is not first. The fix is currently in a beta version of cucumber, see https://github.com/cucumber/cucumber/issues/560
+
 ## 0.15.1 ([#131](https://git.mobcastdev.com/Zuul/zuul-server/pull/131) 2014-09-24 15:03:36)
 
 Fix forwarding logic for SSO delegation
