@@ -1,5 +1,14 @@
 # Zuul Server Change Log
 
+## 0.15.3 ([#132](https://git.mobcastdev.com/Zuul/zuul-server/pull/132) 2014-10-14 12:40:50)
+
+Fix to SSO proxying to forward emails with a different case to forwarded_domains
+
+#### Patch
+* Ensuring both `@forwarded_domains` and the user's email address are downcase so forwarding by email address is no longer case sensitive.
+
+
+
 ## 0.15.2 ([#129](https://git.mobcastdev.com/Zuul/zuul-server/pull/129) 2014-09-05 09:23:05)
 
 Fix tests
