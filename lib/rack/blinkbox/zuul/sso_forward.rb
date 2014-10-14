@@ -10,7 +10,7 @@ module Rack
       class SSOForward < Rack::Forward
 
         def initialize(app, delegate_server: nil, forwarded_domains: nil)
-          @forwarded_domains = if forwarded_domains.strip == "*" then "*" else forwarded_domains.split(",").map { |d| d.strip } rescue [] end
+          @forwarded_domains = if forwarded_domains.strip == "*" then "*" else forwarded_domains.downcase.split(",").map { |d| d.strip } rescue [] end
 
           super(app) do |req|
             unless delegate_server.nil? || delegate_server.empty?
@@ -43,7 +43,7 @@ module Rack
 
         def is_forwarded_username?(username)
           username_parts = if username.nil? then Array.new() else username.split("@") end
-          @forwarded_domains == "*" || @forwarded_domains.include?(username_parts.last) rescue false
+          @forwarded_domains == "*" || @forwarded_domains.include?(username_parts.last.downcase) rescue false
         end
 
         def is_forwarded_user_id?(user_id)
