@@ -1,5 +1,14 @@
 # Zuul Server Change Log
 
+## 0.15.5 ([#134](https://git.mobcastdev.com/Zuul/zuul-server/pull/134) 2014-10-16 10:58:52)
+
+Date/Expires date format changes
+
+### Bug fixes
+
+- The Date and Expires headers are now returned in the correct HTTP
+date format.
+
 ## 0.15.4 ([#133](https://git.mobcastdev.com/Zuul/zuul-server/pull/133) 2014-10-16 10:00:41)
 
 Database reconnects when disconnected
