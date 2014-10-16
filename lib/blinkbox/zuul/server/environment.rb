@@ -62,7 +62,8 @@ module Blinkbox
             password: db.password,
             database: db.path[1..-1],
             encoding: "utf8",
-            pool: 20
+            pool: 20,
+            reconnect: true
           )
 
           @@geoip = GeoIP.new(settings.properties[:geoip_data_file])
