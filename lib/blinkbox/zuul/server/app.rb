@@ -50,7 +50,7 @@ module Blinkbox::Zuul::Server
     after do
       # none of the responses from the auth server should be cached
       cache_control :no_store
-      response["Date"] = response["Expires"] = Time.now.rfc822.to_s
+      response["Date"] = response["Expires"] = Time.now.httpdate
       response["Pragma"] = "no-cache"
       response['X-Application-Version'] = VERSION
     end
