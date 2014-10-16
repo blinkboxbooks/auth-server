@@ -1,5 +1,14 @@
 # Zuul Server Change Log
 
+## 0.15.4 ([#133](https://git.mobcastdev.com/Zuul/zuul-server/pull/133) 2014-10-16 10:00:41)
+
+Database reconnects when disconnected
+
+### Bug fixes
+
+- Now automatically reconnects to the database if the connection is
+dropped (e.g. by the database being restarted).
+
 ## 0.15.3 ([#132](https://git.mobcastdev.com/Zuul/zuul-server/pull/132) 2014-10-14 12:40:50)
 
 Fix to SSO proxying to forward emails with a different case to forwarded_domains
