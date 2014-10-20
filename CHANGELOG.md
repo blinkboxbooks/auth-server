@@ -1,5 +1,11 @@
 # Zuul Server Change Log
 
+## 0.15.6 ([#135](https://git.mobcastdev.com/Zuul/zuul-server/pull/135) 2014-10-20 12:05:44)
+
+Bugfix newrelic config and feature addition for new environments
+
+Bug fix newrelic config
+
 ## 0.15.5 ([#134](https://git.mobcastdev.com/Zuul/zuul-server/pull/134) 2014-10-16 10:58:52)
 
 Date/Expires date format changes
