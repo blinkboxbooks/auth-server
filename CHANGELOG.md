@@ -1,5 +1,13 @@
 # Zuul Server Change Log
 
+## 0.15.7 ([#136](https://git.mobcastdev.com/Zuul/zuul-server/pull/136) 2014-10-24 15:40:15)
+
+CP-1998: Fixed an intermittent bug where user_details where not there
+
+### Bug fixes
+
+- `after_created` would be called regardless of whether the entity was saved or not. That would send a reporting message before the actual data has been committed to the database.
+
 ## 0.15.6 ([#135](https://git.mobcastdev.com/Zuul/zuul-server/pull/135) 2014-10-20 12:05:44)
 
 Bugfix newrelic config and feature addition for new environments
