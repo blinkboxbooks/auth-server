@@ -37,10 +37,10 @@ module Blinkbox::Zuul::Server
     validates :password_hash, presence: true
     validate :validate_password
 
-    after_create :report_user_created
+    after_commit :report_user_created, on: :create
     around_update :record_username_change, :report_user_updated
 
-    scope :where_has_had_username, -> username { 
+    scope :where_has_had_username, -> username {
       current = where(username: username)
       previous_usernames = PreviousUsername.includes(:user).where(username: username).references(:users)
       current.concat(previous_usernames.map { |username| username.user })
@@ -81,7 +81,7 @@ module Blinkbox::Zuul::Server
         SCrypt::Password.create("random string")
         successful = false
       end
-      
+
       LoginAttempt.new(username: username, successful: successful, client_ip: client_ip).save!
       successful ? user : nil
     end
@@ -113,7 +113,7 @@ module Blinkbox::Zuul::Server
         errors.add(:password, "is too short (minimum is #{MIN_PASSWORD_LENGTH} characters)")
       end
     end
-    
+
     def report_user_created
       fields = %w{id username first_name last_name allow_marketing_communications}
       user = fields.each_with_object({}) do |field, hash|

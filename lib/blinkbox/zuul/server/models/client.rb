@@ -31,7 +31,7 @@ module Blinkbox::Zuul::Server
     returns_value_or_default :model, "Unknown Model"
     returns_value_or_default :os, "Unknown OS"
 
-    after_create :report_client_created
+    after_commit :report_client_created, on: :create
     around_update :report_client_updated
 
     def self.authenticate(id, secret)
@@ -58,8 +58,6 @@ module Blinkbox::Zuul::Server
         end
       end
     end
-
-
 
     def as_json(options = {})
       json = {
