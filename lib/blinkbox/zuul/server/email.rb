@@ -31,7 +31,7 @@ module Blinkbox
               xml.template template
               xml.to {
                 to.each do |user|
-                  xml.recipient { xml.name user.name; xml.email user.username }
+                  xml.recipient { xml.id user.id; xml.name user.name; xml.email user.username }
                 end
               }
               xml.templateVariables {

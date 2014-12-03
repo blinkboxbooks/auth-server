@@ -107,6 +107,9 @@ Then(/^I receive a (.+) email$/) do |email_type|
   if TEST_CONFIG[:in_proc]
     @email_message = Nokogiri::XML(Blinkbox::Zuul::Server::Email.sent_messages.pop)
 
+    email_message_value("/e:sendEmail/e:to/e:recipient/e:id") do |text|
+      expect(text).to eq("#{@me.local_id}")
+    end
     email_message_value("/e:sendEmail/e:to/e:recipient/e:name") do |text|
       expect(text).to eq("#{@me.first_name} #{@me.last_name}")
     end
