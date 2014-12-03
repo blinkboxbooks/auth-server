@@ -1,5 +1,14 @@
 # Zuul Server Change Log
 
+## 0.16.0 ([#137](https://git.mobcastdev.com/Zuul/zuul-server/pull/137) 2014-12-03 11:44:25)
+
+Added identifiers to #sendEmail message
+
+### New features
+
+- Now sends the user identifier in the #sendEmail message as this is
+required by ExactTarget to send mails via the API.
+
 ## 0.15.7 ([#136](https://git.mobcastdev.com/Zuul/zuul-server/pull/136) 2014-10-24 15:40:15)
 
 CP-1998: Fixed an intermittent bug where user_details where not there
