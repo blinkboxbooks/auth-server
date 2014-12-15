@@ -5,13 +5,13 @@ require "scrypt"
 
 require "rack/blinkbox/zuul/tokens"
 require "rack/blinkbox/zuul/sso_forward"
-require "rack/jsonlogger"
-require "rack/timekeeper"
 require "sinatra/contrib"
 require "sinatra/oauth_helper"
 require "sinatra/www_authenticate_helper"
+require "sinatra/blinkbox/logger_context"
 require "sinatra/blinkbox/zuul/authorization"
 require "sinatra/blinkbox/zuul/elevation"
+require "blinkbox/common_logging"
 require "blinkbox/zuul/server/environment"
 require "blinkbox/zuul/server/errors"
 require "blinkbox/zuul/server/email"
@@ -19,24 +19,16 @@ require "blinkbox/zuul/server/reporting"
 
 module Blinkbox::Zuul::Server
   class App < Sinatra::Base
-    LOGGER_NAME = "zuul.errors"
-
-    use Rack::Timekeeper, logdev: settings.properties["logging.perf.file"], level: ::Logger.const_get(settings.properties["logging.perf.level"]) do |duration|
-      if duration < settings.properties["logging.perf.threshold.info"].to_i then :DEBUG
-      elsif duration < settings.properties["logging.perf.threshold.warn"].to_i then :INFO
-      elsif duration < settings.properties["logging.perf.threshold.error"].to_i then :WARN
-      else :ERROR
-      end
-    end
-
-    use Rack::JsonLogger, LOGGER_NAME, logdev: settings.properties["logging.error.file"], level: ::Logger.const_get(settings.properties["logging.error.level"])
     use Rack::Blinkbox::Zuul::TokenDecoder, Rack::Blinkbox::Zuul::FileKeyFinder.new(settings.properties['auth.keysPath'])
     use Rack::Blinkbox::Zuul::SSOForward, delegate_server: settings.properties["delegate_auth_server_url"], forwarded_domains: settings.properties["forwarded_domains"]
     helpers Sinatra::OAuthHelper
     helpers Sinatra::WWWAuthenticateHelper
+    helpers Sinatra::Blinkbox::LoggerContext
     register Sinatra::Namespace
     register Sinatra::Blinkbox::Zuul::Authorization
     register Sinatra::Blinkbox::Zuul::Elevation
+    
+    logger = Blinkbox::CommonLogging.from_config(properties.tree(:logging))
 
     require_user_authorization_for %r{^/clients}
     require_user_authorization_for %r{^/users}
@@ -52,16 +44,22 @@ module Blinkbox::Zuul::Server
       cache_control :no_store
       response["Date"] = response["Expires"] = Time.now.httpdate
       response["Pragma"] = "no-cache"
-      response['X-Application-Version'] = VERSION
+      response["X-Application-Version"] = VERSION
+
+      log_method = case response.status
+                   when 500..599 then :error
+                   when 400, 402..499 then :warn # 401 is a common case so don't warn for it
+                   else :info
+                   end
+      logger.send(log_method, with_http_context("#{request.request_method} #{request.path} returned #{response.status}"))
     end
 
     error TooManyRequests do
-      env[LOGGER_NAME].warn("Requests are being throttled: #{env["sinatra.error"].message}")
       halt 429, { "Retry-After" => env["sinatra.error"].retry_after.ceil.to_s }, nil
     end
 
     error do
-      env[LOGGER_NAME].error(env["sinatra.error"])
+      logger.error(env["sinatra.error"])
       halt 500, nil
     end
 

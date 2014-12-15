@@ -4,6 +4,24 @@ require "java_properties"
 require "uri"
 require "geoip"
 
+# using this extension copied from common_config rather than actually using that library
+# because that library introduces mathn which causes indeterminate breaks in the maths that
+# this service does and it isn't worth the risk of introducing it
+module JavaProperties
+  class Properties
+    def tree(root)
+      hash = {}
+      @props.each { |key, value|
+        len = root.length + 1
+        if key.to_s.slice(0, len) == root.to_s + '.'
+          hash[key.to_s[len..-1].to_sym] = value
+        end
+      }
+      hash
+    end
+  end
+end
+
 module Blinkbox
   module Zuul
     module Server
@@ -30,6 +48,12 @@ module Blinkbox
 
           properties = JavaProperties::Properties.new(REF_PROPFILE)
           properties.load(APP_PROPFILE) if File.exists? APP_PROPFILE
+
+          # this is also a bit of a dirty hack as the common_config library would convert these props into
+          # the right type but the old library leaves them as strings, so we just do a hacky convert here
+          properties[:"logging.udp.port"] = properties[:"logging.udp.port"].to_i rescue properties[:"logging.udp.port"]
+          properties[:"logging.gelf.maxChunkSize"] = properties[:"logging.gelf.maxChunkSize"].to_i rescue properties[:"logging.gelf.maxChunkSize"]
+          properties[:"logging.console.enabled"] = properties[:"logging.console.enabled"] == "true"
 
           invalid_props = []
           invalid_reqs = PROPERTIES_REQUIREMENTS.map { |req|
