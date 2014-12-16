@@ -1,5 +1,18 @@
 # Zuul Server Change Log
 
+## 0.17.0 ([#138](https://git.mobcastdev.com/Zuul/zuul-server/pull/138) 2014-12-16 17:17:12)
+
+Updated the auth server to use Graylog
+
+### New features
+
+- Logs all messages to Graylog instead of to log files
+
+### Notes
+
+- Removed the logging of timing information to files as we now get this
+from New Relic.
+
 ## 0.16.0 ([#137](https://git.mobcastdev.com/Zuul/zuul-server/pull/137) 2014-12-03 11:44:25)
 
 Added identifiers to #sendEmail message
