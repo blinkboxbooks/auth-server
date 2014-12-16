@@ -5,6 +5,9 @@ module Sinatra
     module LoggerContext
 
       module Util
+        # these header names are used to create the logging name. if in future we want to log both request and response
+        # headers with the same name then you'll need to change the logic so that they have different logged names. don't
+        # change these ones though as these are the standard logging names used by all our apps and the client apps.
         InterestingRequestHeaders = ["Accept-Encoding", "User-Agent" , "Via", "X-Forwarded-For", "X-Requested-With"]
         InterestingResponseHeaders = ["Cache-Control", "Content-Length", "WWW-Authenticate"]
 
