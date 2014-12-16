@@ -31,7 +31,7 @@ module Sinatra
         end
       end
 
-      def with_http_context(message)
+      def with_http_context(message, extra_context = {})
         {
           short_message: message,
           facilityVersion: VERSION,
@@ -40,7 +40,7 @@ module Sinatra
           httpPathAndQuery: request.path + request.query_string,        
           httpClientIP: request.ip,
           httpStatus: response.status
-        }.merge(Util.headers(request, response))
+        }.merge(Util.headers(request, response)).merge(extra_context)
       end
 
     end

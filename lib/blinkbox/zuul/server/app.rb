@@ -28,8 +28,6 @@ module Blinkbox::Zuul::Server
     register Sinatra::Blinkbox::Zuul::Authorization
     register Sinatra::Blinkbox::Zuul::Elevation
     
-    logger = Blinkbox::CommonLogging.from_config(properties.tree(:logging))
-
     require_user_authorization_for %r{^/clients}
     require_user_authorization_for %r{^/users}
     require_user_authorization_for %r{^/password/change}
@@ -38,6 +36,12 @@ module Blinkbox::Zuul::Server
     require_elevation_for %r{^/users}
     require_elevation_for %r{^/clients}, methods: %i(post patch delete)
     require_elevation_for %r{^/session}, level: :elevated, methods: :post
+
+    configure do
+      set :logging, nil
+      logger = Blinkbox::CommonLogging.from_config(properties.tree(:logging))
+      set :logger, logger
+    end
 
     after do
       # none of the responses from the auth server should be cached
@@ -51,7 +55,7 @@ module Blinkbox::Zuul::Server
                    when 400, 402..499 then :warn # 401 is a common case so don't warn for it
                    else :info
                    end
-      logger.send(log_method, with_http_context("#{request.request_method} #{request.path} returned #{response.status}"))
+      settings.logger.send(log_method, with_http_context("#{request.request_method} #{request.path} returned #{response.status}"))
     end
 
     error TooManyRequests do
@@ -59,7 +63,7 @@ module Blinkbox::Zuul::Server
     end
 
     error do
-      logger.error(env["sinatra.error"])
+      settings.logger.error(env["sinatra.error"])
       halt 500, nil
     end
 
@@ -102,6 +106,8 @@ module Blinkbox::Zuul::Server
       halt 404 if client.nil? || client.user != current_user || client.deregistered
 
       client.deregister
+      settings.logger.info(with_http_context("Deleted client #{client.id} from user #{client.user.id}", userId: client.user.id))
+      nil # no entity-body needed
     end
 
     get "/oauth2/token", provides: :json do
@@ -121,6 +127,7 @@ module Blinkbox::Zuul::Server
 
       refresh_token.revoked = true
       refresh_token.save!
+      settings.logger.info(with_http_context("Revoked refresh token #{refresh_token.id} from user #{refresh_token.user.id}", userId: refresh_token.user.id))
       nil # no entity-body needed
     end
 
@@ -168,6 +175,7 @@ module Blinkbox::Zuul::Server
       current_user.save! rescue invalid_request("new_password_too_short", "The new password is too short.")
 
       Blinkbox::Zuul::Server::Email.password_confirmed(current_user)
+      settings.logger.info(with_http_context("Changed password for user #{current_user.id}", userId: current_user.id))
       nil # no entity-body needed
     end
 
@@ -185,6 +193,9 @@ module Blinkbox::Zuul::Server
 
         reset_url = settings.properties[:password_reset_url] % { token: reset_token.token }
         Blinkbox::Zuul::Server::Email.password_reset(user, reset_url, reset_token.token)
+        settings.logger.info(with_http_context("Sent password reset email to user #{user.id}", userId: user.id))
+      else
+        settings.logger.info(with_http_context("Not sending password reset email to unknown address #{username}"))
       end
 
       nil # no entity-body needed
@@ -222,6 +233,7 @@ module Blinkbox::Zuul::Server
 
       begin
         client.save!
+        settings.logger.info(with_http_context("Created client #{client.id} for user #{user.id}", userId: user.id))
       rescue => e
         if e.message == "Validation failed: #{UserClientsValidator.max_clients_error_message}"
           invalid_request "client_limit_reached", e.message
@@ -253,6 +265,7 @@ module Blinkbox::Zuul::Server
       unless client_ip.loopback? || client_ip.private?
         detected_country = @@geoip.country(request.ip)
         if detected_country.nil? || !["GB", "IE"].include?(detected_country.country_code2)
+          settings.logger.info(with_http_context("Geoblocked #{params['username']} registration as detected country was #{detected_country}"))
           invalid_request "country_geoblocked", "You must be in the UK to register"
         end
       end
@@ -292,6 +305,7 @@ module Blinkbox::Zuul::Server
       error[:reason].nil? ? invalid_request(error[:description]) : invalid_request(error[:reason], error[:description]) if error
 
       Blinkbox::Zuul::Server::Email.welcome(user)
+      settings.logger.info(with_http_context("Created user #{user.id}", userId: user.id))
 
       issue_refresh_token(user, client, true)
     end
@@ -305,6 +319,8 @@ module Blinkbox::Zuul::Server
       client = authenticate_client(params, user)
 
       Blinkbox::Zuul::Server::Reporting.user_authenticated(user, client)
+      settings.logger.info(with_http_context("Password authenticated user #{user.id}", userId: user.id))
+
       issue_refresh_token(user, client)
     end
 
@@ -328,6 +344,8 @@ module Blinkbox::Zuul::Server
       refresh_token.save!
 
       Blinkbox::Zuul::Server::Reporting.user_authenticated(refresh_token.user, refresh_token.client)
+      settings.logger.debug(with_http_context("Refreshed access token for user #{refresh_token.user.id}", userId: refresh_token.user.id))
+
       issue_access_token(refresh_token, true)
     end
 
@@ -356,6 +374,8 @@ module Blinkbox::Zuul::Server
       end
 
       Blinkbox::Zuul::Server::Reporting.user_authenticated(user, client)
+      settings.logger.info(with_http_context("Reset password for user #{user.id}", userId: user.id))
+
       issue_refresh_token(user, client)
     end
 
