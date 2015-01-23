@@ -42,8 +42,10 @@ $ gem install bundler
 For development or testing you can install all the dependencies using the `install` command:
 
 ```
-$ bundle install
+$ bundle install --without nothing
 ```
+
+(See https://github.com/bundler/bundler/issues/2862 for why `--without nothing` is useful)
 
 If you have cloned the code from git, then you'll need to ensure that the submodules are also initialised and up-to-date.
 
@@ -137,7 +139,7 @@ Once that is done, edit the file to ensure you have the correct settings. Most o
 To start the server in development/test mode using Thin run: 
 
 ```
-$ rackup -s thin --port 9393
+$ thin --port 9393
 ```
 
 ## Running the tests
