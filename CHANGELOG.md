@@ -1,5 +1,11 @@
 # Zuul Server Change Log
 
+## 0.17.1 ([#139](https://git.mobcastdev.com/Zuul/zuul-server/pull/139) 2015-01-23 11:32:35)
+
+Reduce chance of developer not using thin
+
+patch
+
 ## 0.17.0 ([#138](https://git.mobcastdev.com/Zuul/zuul-server/pull/138) 2014-12-16 17:17:12)
 
 Updated the auth server to use Graylog
