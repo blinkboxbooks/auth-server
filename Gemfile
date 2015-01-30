@@ -1,5 +1,4 @@
-source "http://artifactory.blinkbox.local/artifactory/api/gems/bbb-gems/"
-source "http://artifactory.blinkbox.local/artifactory/api/gems/rubygems/"
+source "https://rubygems.org/"
 
 gem "activerecord", "~> 4.0"
 gem "bunny", "~> 0.0", ">= 0.10.8"
@@ -27,7 +26,7 @@ group :development, :test do
   gem "cucumber-rest"
   gem "httparty"
   gem "rake"
-  gem "rspec", "~>2.99"
+  gem "rspec", "~>3.0"
   gem "ruby-prof"
   gem "simplecov"
   gem "yard"

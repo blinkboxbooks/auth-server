@@ -1,9 +1,3 @@
 [submodule "var/geoip"]
 	path = var/geoip
 	url = git@git.mobcastdev.com:Zuul/geoip-data.git
-[submodule "gpg"]
-	path = gpg
-	url = git@git.mobcastdev.com:ITOPS/gpg.books.teamcity.dev.git
-[submodule "rpm"]
-	path = rpm
-	url = git@git.mobcastdev.com:ITOPS/specs.ruby-passenger-apps.git
