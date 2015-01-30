@@ -184,7 +184,7 @@ It's worth noting that `config/testing.properties` is loaded by the test code, b
 
 ## Updating GeoIP data files
 
-The GeoIP data files are stored in a git submodule, [geoip-data](https://git.mobcastdev.com/Zuul/geoip-data) to ensure that this repo doesn't get too large.
+The GeoIP data files - purchased from [MaxMind](https://www.maxmind.com/en/geoip2-country) are stored in a git submodule to ensure that this repo doesn't get too large.
 
 To update the data files, update the GeoIP.dat file in the geoip-data repo with the latest country data file, and then run the following commands in your Zuul server directory:
 

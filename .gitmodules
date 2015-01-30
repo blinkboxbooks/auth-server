@@ -1,3 +1,0 @@
-[submodule "var/geoip"]
-	path = var/geoip
-	url = git@git.mobcastdev.com:Zuul/geoip-data.git
